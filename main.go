@@ -6,21 +6,27 @@ import (
 	"time"
 )
 
-func main() {
-	http.HandleFunc("/", helloWorld)
-	http.ListenAndServe(":8080", nil)
+func worker(workerId int, data chan int) {
+	for x := range data {
+		fmt.Printf("The Worker %d received %d\n", workerId, x)
+		time.Sleep(time.Second)
+	}
 }
 
 func helloWorld(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello World!"))
-	go contador(10)
-	go contador(10)
-	contador(10)
+	canal := make(chan int)
+	workersQuantity := 10
+
+	for i := range workersQuantity {
+		go worker(i, canal)
+	}
+
+	for i := range 110 {
+		canal <- i
+	}
 }
 
-func contador(number int) {
-	for i := range number {
-		fmt.Println(i)
-		time.Sleep(time.Second)
-	}
+func main() {
+	http.HandleFunc("/", helloWorld)
+	http.ListenAndServe(":8080", nil)
 }
