@@ -1,11 +1,15 @@
 package main
 
 import (
+	"api/controller"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	server := gin.Default()
+
+	productController := controller.NewProductController()
 
 	server.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
@@ -13,5 +17,6 @@ func main() {
 		})
 	})
 
+	server.GET("/products", productController.GetProducts)
 	server.Run(":8080")
 }
